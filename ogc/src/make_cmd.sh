@@ -1,1 +1,0 @@
-python3 -m minimax.config.make_cmd --config $1/$2
