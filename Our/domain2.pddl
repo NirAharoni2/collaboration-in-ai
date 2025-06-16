@@ -34,6 +34,8 @@
     (minced ?i - item)
     (on ?i - item ?plate - item)
     (plate ?i - item)
+    (is-tomato ?i - item)
+
     
   )
 
@@ -57,6 +59,26 @@
       (cut ?obj)
   )
 
+  (:action mince-ingredient
+    :parameters (?obj - item ?chef - agent ?loc - location ?cb-loc - location)
+    :precondition
+      (and
+        (has ?chef ?obj)
+        (at ?chef ?loc)
+        (cutting-board ?cb-loc)
+        (cut ?obj)
+        (is-tomato ?obj)
+        (or
+          (and (face ?chef N) (above ?cb-loc ?loc))
+          (and (face ?chef S) (above ?loc ?cb-loc))
+          (and (face ?chef E) (right-of ?loc ?cb-loc))
+          (and (face ?chef W) (right-of ?cb-loc ?loc))
+        )
+      )
+    :effect
+      (minced ?obj)
+  )
+
   (:action pick-item
     :parameters (?obj - item ?chef - agent ?loc - location ?cb-loc - location)
     :precondition
@@ -74,7 +96,6 @@
     :effect
       (and
         (not (at-item ?obj ?cb-loc))
-        (not (occupied ?cb-loc))
         (not (free-hands ?chef))
         (has ?chef ?obj)
       )
@@ -112,7 +133,7 @@
         (at ?chef ?loc)
         (at-item ?plate ?cb-loc)
         (plate ?plate)
-        (cut ?item)
+        (or (cut ?item) (minced ?item))
         (or
           (and (face ?chef N) (above ?cb-loc ?loc))
           (and (face ?chef S) (above ?loc ?cb-loc))

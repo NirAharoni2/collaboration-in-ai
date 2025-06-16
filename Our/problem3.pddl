@@ -50,9 +50,9 @@
     (occupied tile-1-1)
     (occupied tile-1-3)
     (occupied tile-1-4)
+    (occupied tile-2-4)
     (occupied tile-3-3)
     (plate plate1)
-    (is-tomato tomato1)
 
     (above tile-0-0 tile-1-0)
     (above tile-0-1 tile-1-1)
@@ -98,8 +98,7 @@
   (:goal
     (and
       ;(cut tomato1)
-      (cut lettuce1)
-      ;(at-item tomato1 tile-1-3)
+      ;(cut lettuce1)
       ;(on tomato1 plate1)
       (on lettuce1 plate1)
       (at-item plate1 tile-2-0)
