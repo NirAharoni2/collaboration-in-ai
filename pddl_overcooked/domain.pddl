@@ -30,20 +30,22 @@
     (table ?l - location)
 
     ;; Item properties
-    (cut ?i - item)
     (minced ?i - item)
+    (cut ?i - item)
     (on ?i - item ?plate - item)
     (plate ?i - item)
     (is-tomato ?i - item)
 
-    
+    ;; Turn management
+    (agent-turn ?a - agent)
   )
 
-
   (:action cut-ingredient
-    :parameters (?obj - item ?chef - agent ?loc - location ?cb-loc - location)
+    :parameters (?obj - item ?chef - agent ?next - agent ?loc - location ?cb-loc - location)
     :precondition
       (and
+        (agent-turn ?chef)
+        (not (agent-turn ?next))
         (has ?chef ?obj)
         (at ?chef ?loc)
         (not (plate ?obj))
@@ -56,33 +58,26 @@
         )
       )
     :effect
-      (cut ?obj)
+      (and
+        (when (and (cut ?obj) (is-tomato ?obj))
+          (and
+            (minced ?obj)
+          )
+        )
+        (cut ?obj)
+        (not (agent-turn ?chef))
+        (agent-turn ?next)
+      )
   )
 
-  (:action mince-ingredient
-    :parameters (?obj - item ?chef - agent ?loc - location ?cb-loc - location)
-    :precondition
-      (and
-        (has ?chef ?obj)
-        (at ?chef ?loc)
-        (cutting-board ?cb-loc)
-        (cut ?obj)
-        (is-tomato ?obj)
-        (or
-          (and (face ?chef N) (above ?cb-loc ?loc))
-          (and (face ?chef S) (above ?loc ?cb-loc))
-          (and (face ?chef E) (right-of ?loc ?cb-loc))
-          (and (face ?chef W) (right-of ?cb-loc ?loc))
-        )
-      )
-    :effect
-      (minced ?obj)
-  )
+
 
   (:action pick-item
-    :parameters (?obj - item ?chef - agent ?loc - location ?cb-loc - location)
+    :parameters (?obj - item ?chef - agent ?next - agent ?loc - location ?cb-loc - location)
     :precondition
       (and
+        (agent-turn ?chef)
+        (not (agent-turn ?next))
         (free-hands ?chef)
         (at ?chef ?loc)
         (at-item ?obj ?cb-loc)
@@ -96,15 +91,20 @@
     :effect
       (and
         (not (at-item ?obj ?cb-loc))
+        (not (occupied ?cb-loc))
         (not (free-hands ?chef))
         (has ?chef ?obj)
+        (not (agent-turn ?chef))
+        (agent-turn ?next)
       )
   )
 
   (:action put-item
-    :parameters (?obj - item ?chef - agent ?loc - location ?cb-loc - location)
+    :parameters (?obj - item ?chef - agent ?next - agent ?loc - location ?cb-loc - location)
     :precondition
       (and
+        (agent-turn ?chef)
+        (not (agent-turn ?next))
         (has ?chef ?obj)
         (at ?chef ?loc)
         (table ?cb-loc)
@@ -122,13 +122,17 @@
         (free-hands ?chef)
         (not (has ?chef ?obj))
         (occupied ?cb-loc)
+        (not (agent-turn ?chef))
+        (agent-turn ?next)
       )
   )
 
   (:action place-item-on-plate
-    :parameters (?item - item ?plate - item ?chef - agent ?loc - location ?cb-loc - location)
+    :parameters (?item - item ?plate - item ?chef - agent ?next - agent ?loc - location ?cb-loc - location)
     :precondition
       (and
+        (agent-turn ?chef)
+        (not (agent-turn ?next))
         (has ?chef ?item)
         (at ?chef ?loc)
         (at-item ?plate ?cb-loc)
@@ -146,12 +150,16 @@
         (on ?item ?plate)
         (free-hands ?chef)
         (not (has ?chef ?item))
+        (not (agent-turn ?chef))
+        (agent-turn ?next)
       )
   )
 
   (:action move-west
-    :parameters (?a - agent ?from - location ?to - location)
+    :parameters (?a - agent ?next - agent ?from - location ?to - location)
     :precondition (and
+      (agent-turn ?a)
+      (not (agent-turn ?next))
       (at ?a ?from)
       (right-of ?to ?from)
     )
@@ -166,12 +174,16 @@
       )
       (face ?a W)
       (not (face ?a N)) (not (face ?a S)) (not (face ?a E))
+      (not (agent-turn ?a))
+      (agent-turn ?next)
     )
   )
 
   (:action move-east
-    :parameters (?a - agent ?from - location ?to - location)
+    :parameters (?a - agent ?next - agent ?from - location ?to - location)
     :precondition (and
+      (agent-turn ?a)
+      (not (agent-turn ?next))
       (at ?a ?from)
       (right-of ?from ?to)
     )
@@ -186,12 +198,16 @@
       )
       (face ?a E)
       (not (face ?a N)) (not (face ?a S)) (not (face ?a W))
+      (not (agent-turn ?a))
+      (agent-turn ?next)
     )
   )
 
   (:action move-south
-    :parameters (?a - agent ?from - location ?to - location)
+    :parameters (?a - agent ?next - agent ?from - location ?to - location)
     :precondition (and
+      (agent-turn ?a)
+      (not (agent-turn ?next))
       (at ?a ?from)
       (above ?from ?to)
     )
@@ -206,16 +222,20 @@
       )
       (face ?a S)
       (not (face ?a E)) (not (face ?a W)) (not (face ?a N))
+      (not (agent-turn ?a))
+      (agent-turn ?next)
     )
   )
 
   (:action move-north
-    :parameters (?a - agent ?from - location ?to - location)
+    :parameters (?a - agent ?next - agent ?from - location ?to - location)
     :precondition (and
+      (agent-turn ?a)
+      (not (agent-turn ?next))
       (at ?a ?from)
       (above ?to ?from)
     )
-    :effect 
+    :effect
     (and
       (when (and (walkable ?to) (not (occupied ?to)))
         (and
@@ -227,7 +247,20 @@
       )
       (face ?a N)
       (not (face ?a E)) (not (face ?a W)) (not (face ?a S))
+      (not (agent-turn ?a))
+      (agent-turn ?next)
     )
   )
 
+  (:action do-nothing
+    :parameters (?a - agent ?next - agent)
+    :precondition (and
+      (agent-turn ?a)
+      (not (agent-turn ?next))
+    )
+    :effect (and
+      (not (agent-turn ?a))
+      (agent-turn ?next)
+    )
+  )
 )

@@ -1,3 +1,8 @@
+from cloudpickle import instance
+
+from Star import Star
+
+
 class Tile:
     def __init__(self, position, walkable=True):
         self.position = position
@@ -6,7 +11,7 @@ class Tile:
         self.occupied = False
 
     def has_item(self):
-        return self.item is not None
+        return self.item is not None and not isinstance(self.item, Star)
 
     def interact(self, player):
         if self.walkable:

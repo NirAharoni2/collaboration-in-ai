@@ -99,7 +99,7 @@
     (and
       ;(cut tomato1)
       ;(cut lettuce1)
-      ;(on tomato1 plate1)
+      (on tomato1 plate1)
       (on lettuce1 plate1)
       (at-item plate1 tile-2-0)
     )
