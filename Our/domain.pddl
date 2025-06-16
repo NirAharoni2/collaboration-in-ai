@@ -1,229 +1,232 @@
-(define (domain overcooked)
-    (:requirements
-        :typing
-        :negative-preconditions
-        :conditional-effects
-    )
-    (:types agent location item station direction)
+(define (domain kitchen-world)
+  (:requirements :strips :typing :conditional-effects :disjunctive-preconditions :negative-preconditions)
 
-    (:constants
-    N E S W - direction
-    )
+  (:types
+    agent item location direction
+  )
 
-    (:predicates
+  (:constants
+    N S E W - direction
+  )
+
+  (:predicates
+    ;; Positioning
     (at ?a - agent ?l - location)
+    (at-item ?i - item ?l - location)
+    (face ?a - agent ?d - direction)
+
+    ;; Map relations
+    (above ?l1 - location ?l2 - location)
+    (right-of ?l1 - location ?l2 - location)
+    (walkable ?l - location)
     (occupied ?l - location)
-    (holding ?a - agent ?i - item)
-    (item-at ?i - item ?l - location)
-    (station-at ?s - station ?l - location)
-    (right-of   ?l1 - location ?l2 - location)
-    (left-of    ?l1 - location ?l2 - location)
-    (above      ?l1 - location ?l2 - location)
-    (below      ?l1 - location ?l2 - location)
-    (passable   ?l1 - location ?l2 - location)
-    (face      ?a - agent     ?d - direction)
-    )
 
-    (:action move-east
-    :parameters (?a    - agent
-                ?from - location
-                ?to   - location)
+    ;; Agent state
+    (has ?a - agent ?i - item)
+    (free-hands ?a - agent)
+
+    ;; Objects and surface types
+    (cutting-board ?l - location)
+    (table ?l - location)
+
+    ;; Item properties
+    (cut ?i - item)
+    (minced ?i - item)
+    (on ?i - item ?plate - item)
+    (plate ?i - item)
+    (is-tomato ?i - item)
+
+    
+  )
+
+
+  (:action cut-ingredient
+    :parameters (?obj - item ?chef - agent ?loc - location ?cb-loc - location)
+    :precondition
+      (and
+        (has ?chef ?obj)
+        (at ?chef ?loc)
+        (cutting-board ?cb-loc)
+        (or
+          (and (face ?chef N) (above ?cb-loc ?loc))
+          (and (face ?chef S) (above ?loc ?cb-loc))
+          (and (face ?chef E) (right-of ?loc ?cb-loc))
+          (and (face ?chef W) (right-of ?cb-loc ?loc))
+        )
+      )
+    :effect
+      (cut ?obj)
+  )
+
+  (:action mince-ingredient
+    :parameters (?obj - item ?chef - agent ?loc - location ?cb-loc - location)
+    :precondition
+      (and
+        (has ?chef ?obj)
+        (at ?chef ?loc)
+        (cutting-board ?cb-loc)
+        (cut ?obj)
+        (is-tomato ?obj)
+        (or
+          (and (face ?chef N) (above ?cb-loc ?loc))
+          (and (face ?chef S) (above ?loc ?cb-loc))
+          (and (face ?chef E) (right-of ?loc ?cb-loc))
+          (and (face ?chef W) (right-of ?cb-loc ?loc))
+        )
+      )
+    :effect
+      (minced ?obj)
+  )
+
+  (:action pick-item
+    :parameters (?obj - item ?chef - agent ?loc - location ?cb-loc - location)
+    :precondition
+      (and
+        (free-hands ?chef)
+        (at ?chef ?loc)
+        (at-item ?obj ?cb-loc)
+        (or
+          (and (face ?chef N) (above ?cb-loc ?loc))
+          (and (face ?chef S) (above ?loc ?cb-loc))
+          (and (face ?chef E) (right-of ?loc ?cb-loc))
+          (and (face ?chef W) (right-of ?cb-loc ?loc))
+        )
+      )
+    :effect
+      (and
+        (not (at-item ?obj ?cb-loc))
+        (not (free-hands ?chef))
+        (has ?chef ?obj)
+      )
+  )
+
+  (:action put-item
+    :parameters (?obj - item ?chef - agent ?loc - location ?cb-loc - location)
+    :precondition
+      (and
+        (has ?chef ?obj)
+        (at ?chef ?loc)
+        (table ?cb-loc)
+        (not (occupied ?cb-loc))
+        (or
+          (and (face ?chef N) (above ?cb-loc ?loc))
+          (and (face ?chef S) (above ?loc ?cb-loc))
+          (and (face ?chef E) (right-of ?loc ?cb-loc))
+          (and (face ?chef W) (right-of ?cb-loc ?loc))
+        )
+      )
+    :effect
+      (and
+        (at-item ?obj ?cb-loc)
+        (free-hands ?chef)
+        (not (has ?chef ?obj))
+        (occupied ?cb-loc)
+      )
+  )
+
+  (:action place-item-on-plate
+    :parameters (?item - item ?plate - item ?chef - agent ?loc - location ?cb-loc - location)
+    :precondition
+      (and
+        (has ?chef ?item)
+        (at ?chef ?loc)
+        (at-item ?plate ?cb-loc)
+        (plate ?plate)
+        (or (cut ?item) (minced ?item))
+        (or
+          (and (face ?chef N) (above ?cb-loc ?loc))
+          (and (face ?chef S) (above ?loc ?cb-loc))
+          (and (face ?chef E) (right-of ?loc ?cb-loc))
+          (and (face ?chef W) (right-of ?cb-loc ?loc))
+        )
+      )
+    :effect
+      (and
+        (on ?item ?plate)
+        (free-hands ?chef)
+        (not (has ?chef ?item))
+      )
+  )
+
+  (:action move-west
+    :parameters (?a - agent ?from - location ?to - location)
     :precondition (and
-        (at       ?a   ?from)
-        (right-of ?from ?to)
-
-        (not (occupied ?to))
+      (at ?a ?from)
+      (right-of ?to ?from)
     )
     :effect (and
-        ;; movement only if no wall
-        (when (passable ?from ?to)
+      (when (and (walkable ?to) (not (occupied ?to)))
         (and
-            ;; change position
-            (not (at    ?a ?from))
-            (at        ?a ?to)
-
-            ;; update occupancy
-            (occupied ?to)
-            (not (occupied ?from))
+          (not (at ?a ?from))
+          (at ?a ?to)
+          (occupied ?to)
+          (not (occupied ?from))
         )
-        )
-
-        ;; always update facing
-        (face ?a E)
-        (not (face ?a W)) (not (face ?a N)) (not (face ?a S))
+      )
+      (face ?a W)
+      (not (face ?a N)) (not (face ?a S)) (not (face ?a E))
     )
-    )
+  )
 
-    (:action move-west
-    :parameters (?a    - agent
-                ?from - location
-                ?to   - location)
-    :precondition 
+  (:action move-east
+    :parameters (?a - agent ?from - location ?to - location)
+    :precondition (and
+      (at ?a ?from)
+      (right-of ?from ?to)
+    )
+    :effect (and
+      (when (and (walkable ?to) (not (occupied ?to)))
         (and
-            (at       ?a   ?from)
-            (left-of  ?from ?to)
-            (not (occupied ?to))
+          (not (at ?a ?from))
+          (at ?a ?to)
+          (occupied ?to)
+          (not (occupied ?from))
+        )
+      )
+      (face ?a E)
+      (not (face ?a N)) (not (face ?a S)) (not (face ?a W))
     )
-    :effect   
+  )
+
+  (:action move-south
+    :parameters (?a - agent ?from - location ?to - location)
+    :precondition (and
+      (at ?a ?from)
+      (above ?from ?to)
+    )
+    :effect (and
+      (when (and (walkable ?to) (not (occupied ?to)))
         (and
-            (when (passable ?from ?to)
-                (and
-                    (not (at    ?a ?from))
-                    (at        ?a ?to)
-                    (occupied ?to)
-                    (not (occupied ?from))
-                )
-            )
-            (face ?a W)
-            (not (face ?a E)) (not (face ?a N)) (not (face ?a S))
+          (not (at ?a ?from))
+          (at ?a ?to)
+          (occupied ?to)
+          (not (occupied ?from))
         )
+      )
+      (face ?a S)
+      (not (face ?a E)) (not (face ?a W)) (not (face ?a N))
     )
+  )
 
-    (:action move-north
-    :parameters (?a    - agent
-                ?from - location
-                ?to   - location)
+  (:action move-north
+    :parameters (?a - agent ?from - location ?to - location)
     :precondition (and
-        (at       ?a   ?from)
-        (above    ?from ?to)
-        (not (occupied ?to))
+      (at ?a ?from)
+      (above ?to ?from)
     )
-    :effect (and
-        (when (passable ?from ?to)
+    :effect 
+    (and
+      (when (and (walkable ?to) (not (occupied ?to)))
         (and
-            (not (at    ?a ?from))
-            (at        ?a ?to)
-            (occupied ?to)
-            (not (occupied ?from))
+          (not (at ?a ?from))
+          (at ?a ?to)
+          (occupied ?to)
+          (not (occupied ?from))
         )
-        )
-        (face ?a N)
-        (not (face ?a E)) (not (face ?a W)) (not (face ?a S))
-    )
-    )
-
-    (:action move-south
-    :parameters (?a    - agent
-                ?from - location
-                ?to   - location)
-    :precondition (and
-        (at       ?a   ?from)
-        (below    ?from ?to)
-        (not (occupied ?to))
-    )
-    :effect (and
-        (when (passable ?from ?to)
-        (and
-            (not (at    ?a ?from))
-            (at        ?a ?to)
-            (occupied ?to)
-            (not (occupied ?from))
-        )
-        )
-        (face ?a S)
-        (not (face ?a E)) (not (face ?a W)) (not (face ?a N))
-    )
-    )
-
-    (:action stay
-    :parameters (?a - agent)
-    :precondition (and)
-    :effect    (and)
-    )
-
-;; =========================
-  ;; KITCHEN ACTIONS
-  ;; =========================
-
-  ;; Pickup Onion
-  (:action pickup-onion
-    :parameters (?a - agent ?x - x ?y - y ?d - direction)
-    :precondition (and
-      (at ?a ?x ?y)
-      (facing ?a ?d)
-      (onion-station ?x ?y ?d)
-      (hands-free ?a)
-    )
-    :effect (and
-      (not (hands-free ?a))
-      (holding-onion ?a)
+      )
+      (face ?a N)
+      (not (face ?a E)) (not (face ?a W)) (not (face ?a S))
     )
   )
 
-  ;; Put Onion in Pot
-  (:action put-onion-in-pot
-    :parameters (?a - agent ?x - x ?y - y ?d - direction ?n - number ?n1 - number)
-    :precondition (and
-      (at ?a ?x ?y)
-      (facing ?a ?d)
-      (pot-location ?x ?y ?d)
-      (holding-onion ?a)
-      (pot-has ?n)
-      (not (= ?n 3))
-    )
-    :effect (and
-      (not (holding-onion ?a))
-      (hands-free ?a)
-      (not (pot-has ?n))
-      (pot-has ?n1)
-    )
-  )
-
-  ;; Soup becomes ready when pot has 3 onions
-  (:action cook-soup
-    :parameters ()
-    :precondition (pot-has 3)
-    :effect (soup-ready)
-  )
-
-  ;; Pickup Plate
-  (:action pickup-plate
-    :parameters (?a - agent ?x - x ?y - y ?d - direction)
-    :precondition (and
-      (at ?a ?x ?y)
-      (facing ?a ?d)
-      (plate-station ?x ?y ?d)
-      (hands-free ?a)
-    )
-    :effect (and
-      (not (hands-free ?a))
-      (holding-plate ?a)
-    )
-  )
-
-  ;; Fill Plate with Soup
-  (:action fill-plate
-    :parameters (?a - agent ?x - x ?y - y ?d - direction)
-    :precondition (and
-      (at ?a ?x ?y)
-      (facing ?a ?d)
-      (pot-location ?x ?y ?d)
-      (holding-plate ?a)
-      (soup-ready)
-    )
-    :effect (and
-      (not (holding-plate ?a))
-      (holding-soup ?a)
-      (not (soup-ready))
-      (pot-has 0)
-    )
-  )
-
-  ;; Serve Soup
-  (:action serve
-    :parameters (?a - agent ?x - x ?y - y ?d - direction ?s - number ?s1 - number)
-    :precondition (and
-      (at ?a ?x ?y)
-      (facing ?a ?d)
-      (serving-station ?x ?y ?d)
-      (holding-soup ?a)
-      (score ?s)
-    )
-    :effect (and
-      (not (holding-soup ?a))
-      (hands-free ?a)
-      (not (score ?s))
-      (score ?s1)
-    )
-  )
 )
