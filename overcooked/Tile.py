@@ -11,7 +11,7 @@ class Tile:
         self.occupied = False
 
     def has_item(self):
-        return self.item is not None and not isinstance(self.item, Star)
+        return self.item is not None
 
     def interact(self, player):
         if self.walkable:

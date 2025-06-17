@@ -14,6 +14,7 @@ action_str_to_enum = {
     "put-item": Actions.INTERACT,
     "cut-ingredient": Actions.INTERACT,
     "place-item-on-plate": Actions.INTERACT,
+    "submit-item": Actions.INTERACT,
     "stay": Actions.STAY,
 }
 
@@ -22,7 +23,7 @@ def convert_action(name):
 
 def main():
     # Load parsed actions
-    plan = r"C:\studies\github\collaboration-in-ai\pddl_overcooked\plans\plan1_problem1.pddl"
+    plan = r"C:\studies\github\collaboration-in-ai\pddl_overcooked\plans\plan1_problem5.pddl"
 
     actions_raw = parser.parse_action_pairs(plan)
     actions = [(convert_action(a1), convert_action(a2)) for a2, a1 in actions_raw]
