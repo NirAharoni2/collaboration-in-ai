@@ -6,11 +6,11 @@
     cook1 cook2 - agent
 
     ;; Tiles (6 rows x 7 columns)
-    tile-0-0 tile-0-1 tile-0-2 tile-0-3 tile-0-4 tile-0-5 tile-0-6 
-    tile-1-0 tile-1-1 tile-1-2 tile-1-3 tile-1-4 tile-1-5 tile-1-6 
-    tile-2-0 tile-2-1 tile-2-2 tile-2-3 tile-2-4 tile-2-5 tile-2-6 
-    tile-3-0 tile-3-1 tile-3-2 tile-3-3 tile-3-4 tile-3-5 tile-3-6 
-    tile-4-0 tile-4-1 tile-4-2 tile-4-3 tile-4-4 tile-4-5 tile-4-6 
+    tile-0-0 tile-0-1 tile-0-2 tile-0-3 tile-0-4 tile-0-5 tile-0-6
+    tile-1-0 tile-1-1 tile-1-2 tile-1-3 tile-1-4 tile-1-5 tile-1-6
+    tile-2-0 tile-2-1 tile-2-2 tile-2-3 tile-2-4 tile-2-5 tile-2-6
+    tile-3-0 tile-3-1 tile-3-2 tile-3-3 tile-3-4 tile-3-5 tile-3-6
+    tile-4-0 tile-4-1 tile-4-2 tile-4-3 tile-4-4 tile-4-5 tile-4-6
     tile-5-0 tile-5-1 tile-5-2 tile-5-3 tile-5-4 tile-5-5 tile-5-6 - location
 
     ;; Items
@@ -26,16 +26,16 @@
     (table tile-0-4)
     (table tile-0-5)
     (table tile-0-6)
-    (table tile-1-3)
+    (walkable tile-1-3)
     (table tile-1-6)
     (table tile-2-0)
-    (table tile-2-3)
+    (walkable tile-2-3)
     (table tile-2-6)
     (table tile-3-0)
-    (table tile-3-3)
+    (walkable tile-3-3)
     (table tile-3-6)
     (table tile-4-0)
-    (table tile-4-3)
+    (walkable tile-4-3)
     (table tile-4-6)
     (table tile-5-0)
     (table tile-5-1)
@@ -62,7 +62,7 @@
     (walkable tile-4-5)
     (at cook1 tile-1-1)
     (at cook2 tile-1-4)
-    (agent-turn cook2)
+    (agent-turn cook1)
     (face cook1 S)
     (face cook2 S)
     (free-hands cook1)
@@ -150,6 +150,8 @@
     (right-of tile-5-3 tile-5-4)
     (right-of tile-5-4 tile-5-5)
     (right-of tile-5-5 tile-5-6)
+    (star tile-3-0)
+    (occupied tile-3-0)
   )
 
   (:goal
@@ -157,7 +159,7 @@
       (not (minced tomato1))
       (on tomato1 plate1)
       (on lettuce1 plate1)
-      (at-item plate1 tile-3-0)
+      (submitted plate1)
     )
   )
 )

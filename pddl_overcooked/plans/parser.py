@@ -10,7 +10,9 @@ def parse_action_pairs(filename):
             action2 = pair[1].split()[1]
             action_pairs.append([action1, action2])
         else:
-            print(f"Odd number of lines; skipping last line: {pair}")
+            # Handle the last single action if odd
+            action1 = pair[0].split()[1]
+            action_pairs.append([action1, "stay"])  # Single action in its own row
 
     return action_pairs
 

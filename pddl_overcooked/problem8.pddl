@@ -14,7 +14,7 @@
     tile-5-0 tile-5-1 tile-5-2 tile-5-3 tile-5-4 tile-5-5 tile-5-6 - location
 
     ;; Items
-    plate1 tomato1 - item
+    plate1 lettuce1 tomato1 - item
 
   )
 
@@ -62,6 +62,7 @@
     (walkable tile-4-5)
     (at cook1 tile-1-1)
     (at cook2 tile-1-4)
+    (agent-turn cook1)
     (face cook1 S)
     (face cook2 S)
     (free-hands cook1)
@@ -69,13 +70,13 @@
     (cutting-board tile-1-0)
     (table tile-5-5)
     (at-item plate1 tile-5-5)
+    (at-item lettuce1 tile-1-6)
     (at-item tomato1 tile-0-4)
     (occupied tile-1-1)
     (occupied tile-1-4)
     (occupied tile-5-5)
     (occupied tile-1-6)
     (occupied tile-0-4)
-    (occupied tile-3-0)
     (plate plate1)
     (is-tomato tomato1)
     (above tile-0-0 tile-1-0)
@@ -149,13 +150,16 @@
     (right-of tile-5-3 tile-5-4)
     (right-of tile-5-4 tile-5-5)
     (right-of tile-5-5 tile-5-6)
+    (star tile-3-0)
+    (occupied tile-3-0)
   )
 
   (:goal
     (and
-      (on tomato1 plate1)
       (minced tomato1)
-      (at-item plate1 tile-2-0)
+      (on tomato1 plate1)
+      (not (on lettuce1 plate1))
+      (submitted plate1)
     )
   )
 )

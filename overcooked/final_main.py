@@ -22,12 +22,16 @@ def convert_action(name):
 
 def main():
     # Load parsed actions
+<<<<<<< Updated upstream
     plan = r"C:\studies\github\collaboration-in-ai\pddl_overcooked\plans\plan1_problem1.pddl"
+=======
+    plan = r"C:\studies\github\collaboration-in-ai\pddl_overcooked\plans\plan1_problem8.pddl"
+>>>>>>> Stashed changes
 
     actions_raw = parser.parse_action_pairs(plan)
-    actions = [(convert_action(a1), convert_action(a2)) for a2, a1 in actions_raw]
+    actions = [(convert_action(a1), convert_action(a2)) for a1, a2 in actions_raw]
 
-    game = Game()
+    game = Game(4)
     game.render()
     clock = pygame.time.Clock()
 

@@ -2,33 +2,20 @@ import pygame
 from actions import Actions
 from Board import Board
 from Player import Player
+from overcooked.Level import Levels
+
 
 class Game:
-    def __init__(self, tile_size=80):
+    def __init__(self, level_id, tile_size=80, ):
         pygame.init()
         self.tile_size = tile_size
 
         # Define the level layout
-        level_data = [
-            [(2, 0), (2, 0), (2, 0), (2, 0), (2, 4), (2, 0), (2, 0)],  # Row 0
-            [(2, 1), (1, 0), (1, 0), (2, 0), (1, 0), (1, 0), (2, 3)],  # Row 1
-            [(2, 0), (1, 0), (1, 0), (2, 0), (1, 0), (1, 0), (2, 0)],  # Row 2
-            [(2, 5), (1, 0), (1, 0), (2, 0), (1, 0), (1, 0), (2, 0)],  # Row 3
-            [(2, 0), (1, 0), (1, 0), (2, 0), (1, 0), (1, 0), (2, 0)],  # Row 4
-            [(2, 0), (2, 0), (2, 0), (2, 0), (2, 0), (2, 2), (2, 0)]  # Row 5
-        ]
-        '''level_data = [
-            [(2, 0), (2, 0), (2, 0), (2, 0), (2, 4), (2, 0), (2, 0)],  # Row 0
-            [(2, 1), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (2, 3)],  # Row 1
-            [(2, 1), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (2, 0)],  # Row 2
-            [(2, 5), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (2, 0)],  # Row 3
-            [(2, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (2, 0)],  # Row 4
-            [(2, 0), (2, 0), (2, 0), (2, 0), (2, 2), (2, 2), (2, 0)]  # Row 5
-        ]
-        '''
-        self.board = Board(level_data, self)
-        self.player1 = Player("cook1", position=(1, 1))
-        self.player2 = Player("cook1", position=(4, 1))
+        levels = Levels()
+        level = levels.getLevel(level_id)
+        self.board = Board(level.board, self)
+        self.player1, self.player2 = level.players
+
         self.players = [self.player1, self.player2]
         for player in self.players:
             x, y = player.position
