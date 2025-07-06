@@ -39,8 +39,6 @@ This folder includes everything related to domain planning using PDDL.
 | problem8  | 5x5       | None                         | 3      | Tomato-lettuce salad    |
 | problem9  | 5x5       | None                         | 4      | Tomato-lettuce salad    |
 | problem10 | 5x5       | None                         | 2      | Tomato soup             |
-| problem11 | 6x7       | None                         | 2      | Tomato-lettuce salad    |
-
 ---
 
 ### `overcooked/`
