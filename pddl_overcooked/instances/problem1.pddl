@@ -33,7 +33,7 @@
     (occupied tile-1-1)
     (occupied tile-1-4)
     (= (turn) 0)
-    (= (number-of-agents) 2) ; change this if you have more agents
+    (= (number-of-agents) 2)
 
     (table tile-0-0)
     (table tile-0-1)
