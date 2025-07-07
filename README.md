@@ -54,10 +54,11 @@ This folder contains the simulation and interaction environment.
 ---
 
 ## ▶️ How to Use
+install pygame
 
-To run a simulation for a specific level, use the following command in your terminal:
+To run a simulation for a specific level, use the following command in your terminal from collaboration-in-ai folder:
 
 ```bash
 python -m overcooked.main <level_id>
 ```
-<sub>💡 Note: The `<level_id>` corresponds directly to the problem number listed in the table above. For example, problem3 means level_id = 3.</sub>
+<sub>💡 Note: The `<level_id>` corresponds directly to the problem number listed in the table above. For example, problem3 means level_id = 3. (problem 9 doesn't have a simulation)</sub>
