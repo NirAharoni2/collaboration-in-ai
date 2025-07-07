@@ -35,7 +35,7 @@ def start(level_id, plan_path):
 
 def main(level_id):
     level_id = int(level_id)
-    plan_path = rf"C:\studies\github\collaboration-in-ai\pddl_overcooked\instances\plans\plan1_problem{level_id}.pddl"
+    plan_path = rf"pddl_overcooked\instances\plans\plan1_problem{level_id}.pddl"
     start(level_id, plan_path)
 
 if __name__ == "__main__":
