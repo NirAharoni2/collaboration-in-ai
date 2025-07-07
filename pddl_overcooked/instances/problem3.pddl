@@ -87,7 +87,6 @@
     (above tile-2-3 tile-3-3)
     (above tile-2-4 tile-3-4)
 
-
     ;; Right-of relationships
     (right-of tile-0-0 tile-0-1)
     (right-of tile-0-1 tile-0-2)
