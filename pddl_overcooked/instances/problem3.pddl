@@ -35,7 +35,6 @@
     ;; Walkable tiles
     (walkable tile-1-1)
     (walkable tile-1-3)
-
     (walkable tile-2-1)
     (walkable tile-2-3)
 
