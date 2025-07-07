@@ -54,7 +54,7 @@ This folder contains the simulation and interaction environment.
 ---
 
 ## ▶️ How to Use
-install pygame
+First install pygame
 
 To run a simulation for a specific level, use the following command in your terminal from collaboration-in-ai folder:
 
