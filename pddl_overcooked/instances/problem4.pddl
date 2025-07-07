@@ -35,7 +35,7 @@
     (occupied tile-1-3)
     (occupied tile-2-3)
     (= (turn) 0)
-    (= (number-of-agents) 3) ; change this if you have more agents
+    (= (number-of-agents) 3)
 
     ;; Walkable tiles
     (walkable tile-1-1)
